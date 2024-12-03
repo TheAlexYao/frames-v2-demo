@@ -11,6 +11,23 @@ import {
 import { config } from "~/components/providers/WagmiProvider";
 import { Button } from "~/components/ui/Button";
 import { truncateAddress } from "~/lib/truncateAddress";
+import { supabase } from "~/lib/supabase";
+
+type VoteStats = {
+  BRETT: number;
+  POPCAT: number;
+};
+
+type Vote = {
+  id?: string;
+  choice: 'BRETT' | 'POPCAT';
+  wallet_address?: string;
+  fid: number;
+  username?: string;
+  display_name?: string;
+  pfp_url?: string;
+  created_at?: string;
+};
 
 const useCountdown = (targetDate: Date) => {
   const [timeLeft, setTimeLeft] = useState({
@@ -63,6 +80,10 @@ export default function Demo({ title = "$POPCAT vs $BRETT", description }: DemoP
   const { disconnect } = useDisconnect();
   const { connect } = useConnect();
 
+  const [userVote, setUserVote] = useState<Vote | null>(null);
+  const [voteStats, setVoteStats] = useState<VoteStats>({ BRETT: 0, POPCAT: 0 });
+  const [isVoting, setIsVoting] = useState(false);
+
   // Set end date to December 6, 2024 6:00 PM IST (12:30 PM UTC)
   const endDate = new Date("2024-12-06T12:30:00Z");
   const timeLeft = useCountdown(endDate);
@@ -78,31 +99,135 @@ export default function Demo({ title = "$POPCAT vs $BRETT", description }: DemoP
     }
   }, [isSDKLoaded]);
 
-  const signBrett = useCallback(() => {
-    const message = "I voted for $BRETT to outperform $POPCAT.\nParticipate in Meme vs Meme to earn rewards at https://memevsmeme.fun";
-    signMessage(
-      { message },
-      {
-        onSuccess: () => {
-          const encodedText = encodeURIComponent(message);
-          sdk.actions.openUrl(`https://warpcast.com/~/compose?text=${encodedText}`);
-        },
-      }
-    );
-  }, [signMessage]);
+  useEffect(() => {
+    const fetchVotes = async () => {
+      const { data: votes } = await supabase
+        .from('votes')
+        .select('choice')
+        .throwOnError();
+      
+      const stats = votes?.reduce((acc, vote) => {
+        acc[vote.choice as keyof VoteStats]++;
+        return acc;
+      }, { BRETT: 0, POPCAT: 0 } as VoteStats);
+      
+      setVoteStats(stats || { BRETT: 0, POPCAT: 0 });
+    };
 
-  const signPopcat = useCallback(() => {
-    const message = "I voted for $POPCAT to outperform $BRETT. Participate in Meme vs Meme to earn rewards at https://memevsmeme.fun";
-    signMessage(
-      { message },
-      {
-        onSuccess: () => {
-          const encodedText = encodeURIComponent(message);
-          sdk.actions.openUrl(`https://warpcast.com/~/compose?text=${encodedText}`);
-        },
+    fetchVotes();
+
+    const subscription = supabase
+      .channel('votes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'votes' }, 
+        () => fetchVotes())
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  const signBrett = useCallback(async () => {
+    if (isVoting) return;
+    setIsVoting(true);
+    
+    try {
+      const context = await sdk.context;
+      const fid = context?.user?.fid;
+      
+      if (fid) {
+        const { data: existingVote } = await supabase
+          .from('votes')
+          .select()
+          .eq('fid', fid)
+          .single();
+          
+        if (existingVote) {
+          alert('You have already voted!');
+          return;
+        }
       }
-    );
-  }, [signMessage]);
+
+      const message = "I voted for $BRETT to outperform $POPCAT.\nParticipate in Meme vs Meme to earn rewards at https://memevsmeme.fun";
+      
+      signMessage(
+        { message },
+        {
+          onSuccess: async () => {
+            const { data: vote } = await supabase
+              .from('votes')
+              .insert({
+                choice: 'BRETT',
+                wallet_address: address || '',
+                fid: context?.user?.fid,
+                username: context?.user?.username,
+                display_name: context?.user?.displayName,
+                pfp_url: context?.user?.pfpUrl,
+              } satisfies Omit<Vote, 'id' | 'created_at'>)
+              .select()
+              .single();
+              
+            setUserVote(vote);
+            const encodedText = encodeURIComponent(message);
+            sdk.actions.openUrl(`https://warpcast.com/~/compose?text=${encodedText}`);
+          },
+        }
+      );
+    } finally {
+      setIsVoting(false);
+    }
+  }, [signMessage, address, isVoting]);
+
+  const signPopcat = useCallback(async () => {
+    if (isVoting) return;
+    setIsVoting(true);
+    
+    try {
+      const context = await sdk.context;
+      const fid = context?.user?.fid;
+      
+      if (fid) {
+        const { data: existingVote } = await supabase
+          .from('votes')
+          .select()
+          .eq('fid', fid)
+          .single();
+          
+        if (existingVote) {
+          alert('You have already voted!');
+          return;
+        }
+      }
+
+      const message = "I voted for $POPCAT to outperform $BRETT. Participate in Meme vs Meme to earn rewards at https://memevsmeme.fun";
+      
+      signMessage(
+        { message },
+        {
+          onSuccess: async () => {
+            const { data: vote } = await supabase
+              .from('votes')
+              .insert({
+                choice: 'POPCAT',
+                wallet_address: address || '',
+                fid: context?.user?.fid,
+                username: context?.user?.username,
+                display_name: context?.user?.displayName,
+                pfp_url: context?.user?.pfpUrl,
+              } satisfies Omit<Vote, 'id' | 'created_at'>)
+              .select()
+              .single();
+              
+            setUserVote(vote);
+            const encodedText = encodeURIComponent(message);
+            sdk.actions.openUrl(`https://warpcast.com/~/compose?text=${encodedText}`);
+          },
+        }
+      );
+    } finally {
+      setIsVoting(false);
+    }
+  }, [signMessage, address, isVoting]);
 
   const renderError = (error: Error | null) => {
     if (!error) return null;
@@ -170,25 +295,41 @@ export default function Demo({ title = "$POPCAT vs $BRETT", description }: DemoP
 
         {isConnected && (
           <div className="w-full space-y-4 mt-4">
+            <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4">
+              <div 
+                className="bg-purple-600 h-2.5 rounded-full transition-all"
+                style={{ 
+                  width: `${voteStats.POPCAT + voteStats.BRETT === 0 ? 50 : 
+                    (voteStats.POPCAT / (voteStats.POPCAT + voteStats.BRETT)) * 100}%` 
+                }}
+              />
+            </div>
+            
+            <div className="flex justify-between text-sm mb-2">
+              <span>POPCAT: {voteStats.POPCAT}</span>
+              <span>BRETT: {voteStats.BRETT}</span>
+            </div>
+
             <div>
               <Button
                 onClick={signPopcat}
-                disabled={!isConnected || isSignPending}
-                isLoading={isSignPending}
-                className="w-full"
+                disabled={!isConnected || isSignPending || isVoting || userVote !== null}
+                isLoading={isSignPending || isVoting}
+                className={`w-full ${userVote?.choice === 'POPCAT' ? 'bg-green-500' : ''}`}
               >
-                Vote $POPCAT
+                {userVote?.choice === 'POPCAT' ? '✓ Voted $POPCAT' : 'Vote $POPCAT'}
               </Button>
               {isSignError && renderError(signError)}
             </div>
+            
             <div>
               <Button
                 onClick={signBrett}
-                disabled={!isConnected || isSignPending}
-                isLoading={isSignPending}
-                className="w-full"
+                disabled={!isConnected || isSignPending || isVoting || userVote !== null}
+                isLoading={isSignPending || isVoting}
+                className={`w-full ${userVote?.choice === 'BRETT' ? 'bg-green-500' : ''}`}
               >
-                Vote $BRETT
+                {userVote?.choice === 'BRETT' ? '✓ Voted $BRETT' : 'Vote $BRETT'}
               </Button>
               {isSignError && renderError(signError)}
             </div>
