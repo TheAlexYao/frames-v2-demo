@@ -239,8 +239,8 @@ export default function Demo({ title = "$POPCAT vs $BRETT" }: DemoProps) {
   }
 
   return (
-    <div className="flex flex-col items-center w-[300px] mx-auto py-4 px-2">
-      <div className="mb-4">
+    <div className="flex flex-col items-center w-[300px] mx-auto py-2">
+      <div className="mb-2">
         <Image
           src="/meme.png"
           alt={title}
@@ -251,12 +251,12 @@ export default function Demo({ title = "$POPCAT vs $BRETT" }: DemoProps) {
         />
       </div>
 
-      <div className="text-center mb-6 space-y-2">
+      <div className="text-center mb-4 space-y-1">
         <h2 className="text-xl font-bold">{title}</h2>
         
         {isConnected && (
           <>
-            <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4">
+            <div className="w-full bg-gray-200 rounded-full h-2.5 mb-2">
               <div 
                 className="bg-purple-600 h-2.5 rounded-full transition-all"
                 style={{ 
@@ -266,7 +266,7 @@ export default function Demo({ title = "$POPCAT vs $BRETT" }: DemoProps) {
               />
             </div>
             
-            <div className="flex justify-between text-sm mb-2">
+            <div className="flex justify-between text-sm">
               <span>POPCAT: {voteStats.POPCAT}</span>
               <span>BRETT: {voteStats.BRETT}</span>
             </div>
@@ -281,7 +281,7 @@ export default function Demo({ title = "$POPCAT vs $BRETT" }: DemoProps) {
         </p>
         <div className="text-xs text-gray-500 dark:text-gray-400">
           Time remaining:
-          <div className="font-mono text-sm mt-1">
+          <div className="font-mono text-sm">
             {timeLeft.days}d {timeLeft.hours}h {timeLeft.minutes}m {timeLeft.seconds}s
           </div>
         </div>
@@ -290,58 +290,50 @@ export default function Demo({ title = "$POPCAT vs $BRETT" }: DemoProps) {
         </p>
       </div>
 
-      <div className="w-full flex flex-col items-center">
+      <div className="w-full flex flex-col items-center space-y-2">
         {!isConnected && (
-          <div className="w-full">
-            <Button
-              onClick={() => connect({ connector: config.connectors[0] })}
-              className="w-full"
-            >
-              Connect
-            </Button>
-          </div>
+          <Button
+            onClick={() => connect({ connector: config.connectors[0] })}
+            className="w-full"
+          >
+            Connect
+          </Button>
         )}
 
         {isConnected && (
-          <div className="w-full space-y-4">
-            <div>
-              <Button
-                onClick={signPopcat}
-                disabled={!isConnected || isSignPending || isVoting || userVote !== null}
-                isLoading={isSignPending || isVoting}
-                className={`w-full ${userVote?.choice === 'POPCAT' ? 'bg-green-500' : ''}`}
-              >
-                {userVote?.choice === 'POPCAT' ? '✓ Voted $POPCAT' : 'Vote $POPCAT'}
-              </Button>
-              {isSignError && renderError(signError)}
-            </div>
+          <>
+            <Button
+              onClick={signPopcat}
+              disabled={!isConnected || isSignPending || isVoting || userVote !== null}
+              isLoading={isSignPending || isVoting}
+              className={`w-full ${userVote?.choice === 'POPCAT' ? 'bg-green-500' : ''}`}
+            >
+              {userVote?.choice === 'POPCAT' ? '✓ Voted $POPCAT' : 'Vote $POPCAT'}
+            </Button>
+            {isSignError && renderError(signError)}
             
-            <div>
-              <Button
-                onClick={signBrett}
-                disabled={!isConnected || isSignPending || isVoting || userVote !== null}
-                isLoading={isSignPending || isVoting}
-                className={`w-full ${userVote?.choice === 'BRETT' ? 'bg-green-500' : ''}`}
-              >
-                {userVote?.choice === 'BRETT' ? '✓ Voted $BRETT' : 'Vote $BRETT'}
-              </Button>
-              {isSignError && renderError(signError)}
-            </div>
+            <Button
+              onClick={signBrett}
+              disabled={!isConnected || isSignPending || isVoting || userVote !== null}
+              isLoading={isSignPending || isVoting}
+              className={`w-full ${userVote?.choice === 'BRETT' ? 'bg-green-500' : ''}`}
+            >
+              {userVote?.choice === 'BRETT' ? '✓ Voted $BRETT' : 'Vote $BRETT'}
+            </Button>
+            {isSignError && renderError(signError)}
 
-            <div className="mt-8 space-y-2">
-              {address && (
-                <div className="text-xs text-center">
-                  Address: <pre className="inline">{truncateAddress(address)}</pre>
-                </div>
-              )}
-              <Button
-                onClick={() => disconnect()}
-                className="w-full"
-              >
-                Disconnect
-              </Button>
-            </div>
-          </div>
+            {address && (
+              <div className="text-xs text-center">
+                Address: <pre className="inline">{truncateAddress(address)}</pre>
+              </div>
+            )}
+            <Button
+              onClick={() => disconnect()}
+              className="w-full"
+            >
+              Disconnect
+            </Button>
+          </>
         )}
       </div>
     </div>
