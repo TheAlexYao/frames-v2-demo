@@ -110,6 +110,14 @@ export default function Demo(
     });
   }, [signTypedData]);
 
+  const signBrett = useCallback(() => {
+    signMessage({ message: "I voted for $BRETT" });
+  }, [signMessage]);
+
+  const signPopcat = useCallback(() => {
+    signMessage({ message: "I voted for $POPCAT" });
+  }, [signMessage]);
+
   const toggleContext = useCallback(() => {
     setIsContextOpen((prev) => !prev);
   }, []);
@@ -248,6 +256,26 @@ export default function Demo(
                 Sign Typed Data
               </Button>
               {isSignTypedError && renderError(signTypedError)}
+            </div>
+            <div className="mb-4">
+              <Button
+                onClick={signBrett}
+                disabled={!isConnected || isSignPending}
+                isLoading={isSignPending}
+              >
+                Vote $BRETT
+              </Button>
+              {isSignError && renderError(signError)}
+            </div>
+            <div className="mb-4">
+              <Button
+                onClick={signPopcat}
+                disabled={!isConnected || isSignPending}
+                isLoading={isSignPending}
+              >
+                Vote $POPCAT
+              </Button>
+              {isSignError && renderError(signError)}
             </div>
           </>
         )}
