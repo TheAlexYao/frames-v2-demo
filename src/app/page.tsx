@@ -34,5 +34,10 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default function Home() {
-  return (<App />);
+  return (
+    <App 
+      title="$POPCAT vs $BRETT"
+      description="Cast your vote and participate to earn rewards!"
+    />
+  );
 }

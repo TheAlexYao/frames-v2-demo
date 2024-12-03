@@ -44,7 +44,12 @@ const useCountdown = (targetDate: Date) => {
   return timeLeft;
 };
 
-export default function Demo() {
+interface DemoProps {
+  title?: string;
+  description?: string;
+}
+
+export default function Demo({ title = "$POPCAT vs $BRETT", description }: DemoProps) {
   const [isSDKLoaded, setIsSDKLoaded] = useState(false);
 
   const { address, isConnected } = useAccount();
@@ -113,7 +118,7 @@ export default function Demo() {
       <div className="mb-4">
         <Image
           src="/meme.png"
-          alt="Meme vs Meme"
+          alt={title}
           width={300}
           height={169}
           className="rounded-xl"
@@ -122,7 +127,10 @@ export default function Demo() {
       </div>
 
       <div className="text-center mb-6 space-y-2">
-        <h2 className="text-xl font-bold">$POPCAT vs $BRETT</h2>
+        <h2 className="text-xl font-bold">{title}</h2>
+        {description && (
+          <p className="text-sm text-gray-600 dark:text-gray-300">{description}</p>
+        )}
         <p className="text-sm text-gray-600 dark:text-gray-300">
           Cast your vote for the next meme to moon! 🚀
         </p>
