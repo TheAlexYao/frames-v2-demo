@@ -68,6 +68,7 @@ interface DemoProps {
 
 export default function Demo({ title = "$POPCAT vs $BRETT" }: DemoProps) {
   const [isSDKLoaded, setIsSDKLoaded] = useState(false);
+  const [isInFrame, setIsInFrame] = useState(false);
 
   const { address, isConnected } = useAccount();
   const {
@@ -125,6 +126,40 @@ export default function Demo({ title = "$POPCAT vs $BRETT" }: DemoProps) {
     return () => {
       subscription.unsubscribe();
     };
+  }, []);
+
+  useEffect(() => {
+    const fetchUserVote = async () => {
+      if (!isConnected) return;
+      
+      const context = await sdk.context;
+      const fid = context?.user?.fid;
+      
+      if (fid) {
+        const { data: existingVote } = await supabase
+          .from('votes')
+          .select()
+          .eq('fid', fid)
+          .single();
+          
+        if (existingVote) {
+          setUserVote(existingVote);
+        }
+      }
+    };
+
+    fetchUserVote();
+  }, [isConnected]);
+
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data && event.data.type === 'fc:frame:init') {
+        setIsInFrame(true);
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
   }, []);
 
   const signBrett = useCallback(async () => {
@@ -249,6 +284,11 @@ export default function Demo({ title = "$POPCAT vs $BRETT" }: DemoProps) {
 
   return (
     <div className="flex flex-col items-center w-[300px] mx-auto py-2">
+      {!isInFrame && (
+        <p className="text-sm text-gray-500 mb-2 text-center">
+          ⚡️ Open in Warpcast to participate in the vote!
+        </p>
+      )}
       <div className="mb-2">
         <Image
           src="/meme.png"
