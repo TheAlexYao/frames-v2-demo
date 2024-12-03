@@ -1,5 +1,6 @@
 import { useEffect, useCallback, useState } from "react";
 import sdk from "@farcaster/frame-sdk";
+import Image from "next/image";
 import {
   useAccount,
   useSignMessage,
@@ -11,9 +12,39 @@ import { config } from "~/components/providers/WagmiProvider";
 import { Button } from "~/components/ui/Button";
 import { truncateAddress } from "~/lib/truncateAddress";
 
-export default function Demo(
-  { title }: { title?: string } = { title: "Frames v2 Demo" }
-) {
+const useCountdown = (targetDate: Date) => {
+  const [timeLeft, setTimeLeft] = useState({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+  });
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = new Date().getTime();
+      const distance = targetDate.getTime() - now;
+
+      if (distance < 0) {
+        clearInterval(interval);
+        return;
+      }
+
+      setTimeLeft({
+        days: Math.floor(distance / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+        minutes: Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)),
+        seconds: Math.floor((distance % (1000 * 60)) / 1000),
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [targetDate]);
+
+  return timeLeft;
+};
+
+export default function Demo({ title }: { title?: string } = { title: "Meme vs Meme" }) {
   const [isSDKLoaded, setIsSDKLoaded] = useState(false);
 
   const { address, isConnected } = useAccount();
@@ -26,6 +57,10 @@ export default function Demo(
 
   const { disconnect } = useDisconnect();
   const { connect } = useConnect();
+
+  // Set end date to December 6, 2024 6:00 PM IST (12:30 PM UTC)
+  const endDate = new Date("2024-12-06T12:30:00Z");
+  const timeLeft = useCountdown(endDate);
 
   useEffect(() => {
     const load = async () => {
@@ -74,51 +109,82 @@ export default function Demo(
   }
 
   return (
-    <div className="w-[300px] mx-auto py-4 px-2">
-      <h1 className="text-2xl font-bold text-center mb-4">{title}</h1>
+    <div className="flex flex-col items-center w-[300px] mx-auto py-4 px-2">
+      <div className="mb-4">
+        <Image
+          src="/meme.png"
+          alt="Meme vs Meme"
+          width={300}
+          height={169}
+          className="rounded-xl"
+          priority
+        />
+      </div>
 
-      <div>
+      <div className="text-center mb-6 space-y-2">
+        <h2 className="text-xl font-bold">$POPCAT vs $BRETT</h2>
+        <p className="text-sm text-gray-600 dark:text-gray-300">
+          Cast your vote for the next meme to moon! 🚀
+        </p>
+        <p className="text-sm font-medium text-purple-600 dark:text-purple-400">
+          Participate to receive rewards! 🎁
+        </p>
+        <div className="text-xs text-gray-500 dark:text-gray-400">
+          Time remaining:
+          <div className="font-mono text-sm mt-1">
+            {timeLeft.days}d {timeLeft.hours}h {timeLeft.minutes}m {timeLeft.seconds}s
+          </div>
+        </div>
+        <p className="text-xs text-gray-500 dark:text-gray-400">
+          Sign with your wallet and share on Warpcast to participate
+        </p>
+      </div>
+
+      <div className="w-full flex flex-col items-center">
         {address && (
           <div className="my-2 text-xs">
             Address: <pre className="inline">{truncateAddress(address)}</pre>
           </div>
         )}
 
-        <div className="mb-4">
+        <div className="w-full">
           <Button
             onClick={() =>
               isConnected
                 ? disconnect()
                 : connect({ connector: config.connectors[0] })
             }
+            className="w-full"
           >
             {isConnected ? "Disconnect" : "Connect"}
           </Button>
         </div>
 
         {isConnected && (
-          <>
-            <div className="mb-4">
-              <Button
-                onClick={signBrett}
-                disabled={!isConnected || isSignPending}
-                isLoading={isSignPending}
-              >
-                Vote $BRETT
-              </Button>
-              {isSignError && renderError(signError)}
-            </div>
-            <div className="mb-4">
+          <div className="w-full space-y-4 mt-4">
+            <div>
               <Button
                 onClick={signPopcat}
                 disabled={!isConnected || isSignPending}
                 isLoading={isSignPending}
+                className="w-full"
               >
                 Vote $POPCAT
               </Button>
               {isSignError && renderError(signError)}
             </div>
-          </>
+            <div>
+              <Button
+                onClick={signBrett}
+                disabled={!isConnected || isSignPending}
+                isLoading={isSignPending}
+                className="w-full"
+              >
+                Vote $BRETT
+              </Button>
+              {isSignError && renderError(signError)}
+            </div>
+          </div>
         )}
       </div>
     </div>
