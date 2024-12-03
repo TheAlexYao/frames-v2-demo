@@ -229,6 +229,15 @@ export default function Demo({ title = "$POPCAT vs $BRETT" }: DemoProps) {
     }
   }, [signMessage, address, isVoting]);
 
+  const resendWarpcastMessage = useCallback((choice: 'BRETT' | 'POPCAT') => {
+    const message = choice === 'BRETT' 
+      ? "I voted for $BRETT to outperform $POPCAT.\n\nParticipate in Meme vs Meme to earn rewards at https://memevsmeme.fun"
+      : "I voted for $POPCAT to outperform $BRETT.\n\nParticipate in Meme vs Meme to earn rewards at https://memevsmeme.fun";
+    
+    const encodedText = encodeURIComponent(message);
+    sdk.actions.openUrl(`https://warpcast.com/~/compose?text=${encodedText}`);
+  }, []);
+
   const renderError = (error: Error | null) => {
     if (!error) return null;
     return <div className="text-red-500 text-xs mt-1">{error.message}</div>;
@@ -303,22 +312,22 @@ export default function Demo({ title = "$POPCAT vs $BRETT" }: DemoProps) {
         {isConnected && (
           <>
             <Button
-              onClick={signPopcat}
-              disabled={!isConnected || isSignPending || isVoting || userVote !== null}
-              isLoading={isSignPending || isVoting}
+              onClick={userVote?.choice === 'POPCAT' ? () => resendWarpcastMessage('POPCAT') : signPopcat}
+              disabled={!isConnected || (!userVote && (isSignPending || isVoting))}
+              isLoading={!userVote && (isSignPending || isVoting)}
               className={`w-full ${userVote?.choice === 'POPCAT' ? 'bg-green-500' : ''}`}
             >
-              {userVote?.choice === 'POPCAT' ? '✓ Voted $POPCAT' : 'Vote $POPCAT'}
+              {userVote?.choice === 'POPCAT' ? 'Share $POPCAT Vote' : 'Vote $POPCAT'}
             </Button>
             {isSignError && renderError(signError)}
             
             <Button
-              onClick={signBrett}
-              disabled={!isConnected || isSignPending || isVoting || userVote !== null}
-              isLoading={isSignPending || isVoting}
+              onClick={userVote?.choice === 'BRETT' ? () => resendWarpcastMessage('BRETT') : signBrett}
+              disabled={!isConnected || (!userVote && (isSignPending || isVoting))}
+              isLoading={!userVote && (isSignPending || isVoting)}
               className={`w-full ${userVote?.choice === 'BRETT' ? 'bg-green-500' : ''}`}
             >
-              {userVote?.choice === 'BRETT' ? '✓ Voted $BRETT' : 'Vote $BRETT'}
+              {userVote?.choice === 'BRETT' ? 'Share $BRETT Vote' : 'Vote $BRETT'}
             </Button>
             {isSignError && renderError(signError)}
 
