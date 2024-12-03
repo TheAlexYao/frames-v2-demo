@@ -253,11 +253,8 @@ export default function Demo({ title = "$POPCAT vs $BRETT", description }: DemoP
 
       <div className="text-center mb-6 space-y-2">
         <h2 className="text-xl font-bold">{title}</h2>
-        {description && (
-          <p className="text-sm text-gray-600 dark:text-gray-300">{description}</p>
-        )}
         <p className="text-sm text-gray-600 dark:text-gray-300">
-          Cast your vote for the next meme to moon! 🚀
+          Cast your vote for the next meme to moon!
         </p>
         <p className="text-sm font-medium text-purple-600 dark:text-purple-400">
           Participate to receive rewards! 🎁
