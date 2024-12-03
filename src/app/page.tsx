@@ -5,14 +5,14 @@ const appUrl = process.env.NEXT_PUBLIC_URL;
 
 const frame = {
   version: "next",
-  imageUrl: `${appUrl}/opengraph-image`,
+  imageUrl: `${appUrl}/meme.png`,
   button: {
     title: "Launch Frame",
     action: {
       type: "launch_frame",
-      name: "Farcaster Frames v2 Demo",
+      name: "Meme vs Meme",
       url: appUrl,
-      splashImageUrl: `${appUrl}/splash.png`,
+      splashImageUrl: `${appUrl}/meme.png`,
       splashBackgroundColor: "#f7f7f7",
     },
   },
@@ -22,10 +22,11 @@ export const revalidate = 300;
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
-    title: "Farcaster Frames v2 Demo",
+    title: "$POPCAT vs $BRETT",
     openGraph: {
-      title: "Farcaster Frames v2 Demo",
-      description: "A Farcaster Frames v2 demo app.",
+      title: "$POPCAT vs $BRETT",
+      description: "Cast your vote and participate to earn rewards!",
+      images: [`${appUrl}/meme.png`],
     },
     other: {
       "fc:frame": JSON.stringify(frame),
