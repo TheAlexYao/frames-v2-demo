@@ -8,21 +8,22 @@ export const revalidate = 300;
 export async function generateMetadata(): Promise<Metadata> {
   const frameMetadata = {
     version: "vNext",
-    image: {
-      src: `${appUrl}/meme.png`,
-      aspectRatio: "1.91:1"
-    },
-    buttons: [
-      {
-        label: "Vote $POPCAT",
-        action: "post"
-      },
-      {
-        label: "Vote $BRETT",
-        action: "post"
-      }
-    ],
-    postUrl: `${appUrl}/api/vote`
+    frames: {
+      version: "1",
+      image: `${appUrl}/meme.png`,
+      imageAspectRatio: "1.91:1",
+      buttons: [
+        {
+          label: "Vote $POPCAT",
+          action: "post"
+        },
+        {
+          label: "Vote $BRETT",
+          action: "post"
+        }
+      ],
+      postUrl: `${appUrl}/api/vote`
+    }
   };
 
   return {
@@ -38,12 +39,6 @@ export async function generateMetadata(): Promise<Metadata> {
         alt: "$POPCAT vs $BRETT"
       }]
     },
-    twitter: {
-      card: "summary_large_image",
-      title: "$POPCAT vs $BRETT - Which Meme Will Win?",
-      description: "Vote for your favorite meme and participate to earn rewards! Join the ultimate meme showdown.",
-      images: [`${appUrl}/meme.png`],
-    },
     other: {
       "fc:frame": JSON.stringify(frameMetadata),
       "fc:frame:image": `${appUrl}/meme.png`,
@@ -51,6 +46,7 @@ export async function generateMetadata(): Promise<Metadata> {
       "fc:frame:post_url": `${appUrl}/api/vote`,
       "fc:frame:button:1": "Vote $POPCAT",
       "fc:frame:button:2": "Vote $BRETT",
+      "fc:frame:version": "vNext"
     },
   };
 }
