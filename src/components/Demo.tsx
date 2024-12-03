@@ -183,7 +183,7 @@ export default function Demo({ title = "$POPCAT vs $BRETT" }: DemoProps) {
         }
       }
 
-      const message = "I voted for $BRETT to outperform $POPCAT.\nParticipate in Meme vs Meme to earn rewards at https://memevsmeme.fun";
+      const message = "I voted for $BRETT to outperform $POPCAT.\nParticipate in Meme vs Meme to earn rewards at Meme vs Meme: https://memevsmeme.fun";
       
       signMessage(
         { message },
@@ -234,7 +234,7 @@ export default function Demo({ title = "$POPCAT vs $BRETT" }: DemoProps) {
         }
       }
 
-      const message = "I voted for $POPCAT to outperform $BRETT. Participate in Meme vs Meme to earn rewards at https://memevsmeme.fun";
+      const message = "I voted for $POPCAT to outperform $BRETT. Participate in Meme vs Meme to earn rewards at Meme vs Meme: https://memevsmeme.fun";
       
       signMessage(
         { message },
