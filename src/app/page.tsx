@@ -10,10 +10,13 @@ export async function generateMetadata(): Promise<Metadata> {
     version: "next",
     imageUrl: `${appUrl}/meme.png`,
     button: {
-      label: "Vote Now",
+      title: "Vote Now",
       action: {
-        type: "link",
-        url: appUrl
+        type: "launch_frame",
+        name: "Meme vs Meme",
+        url: appUrl,
+        splashImageUrl: `${appUrl}/meme.png`,
+        splashBackgroundColor: "#f7f7f7",
       }
     }
   };

@@ -1,7 +1,9 @@
+import { NextResponse } from "next/server";
+
 export async function GET() {
   const appUrl = process.env.NEXT_PUBLIC_URL;
 
-  const config = {
+  const manifest = {
     accountAssociation: {
       header: "eyJmaWQiOjU4MSwidHlwZSI6ImN1c3RvZHkiLCJrZXkiOiIweDZGMTY1QjZmZmFGM2FjZEYwOTc4YWUxNjI0NEVlRUZlNDBDMDkyYjIifQ",
       payload: "eyJkb21haW4iOiJ3d3cubWVtZXZzbWVtZS5mdW4ifQ",
@@ -10,12 +12,12 @@ export async function GET() {
     frame: {
       version: "0.0.0",
       name: "Meme vs Meme",
+      homeUrl: appUrl,
       iconUrl: `${appUrl}/meme.png`,
       splashImageUrl: `${appUrl}/meme.png`,
       splashBackgroundColor: "#f7f7f7",
-      homeUrl: appUrl,
     }
   };
 
-  return Response.json(config);
+  return NextResponse.json(manifest);
 }
