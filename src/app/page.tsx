@@ -3,28 +3,28 @@ import App from "./app";
 
 const appUrl = process.env.NEXT_PUBLIC_URL;
 
-const frame = {
-  version: "vNext",
-  image: {
-    src: `${appUrl}/meme.png`,
-    aspectRatio: "1.91:1"
-  },
-  buttons: [
-    {
-      label: "Vote $POPCAT",
-      action: "post"
-    },
-    {
-      label: "Vote $BRETT",
-      action: "post"
-    }
-  ],
-  postUrl: `${appUrl}/api/vote`
-};
-
 export const revalidate = 300;
 
 export async function generateMetadata(): Promise<Metadata> {
+  const frameMetadata = {
+    version: "vNext",
+    image: {
+      src: `${appUrl}/meme.png`,
+      aspectRatio: "1.91:1"
+    },
+    buttons: [
+      {
+        label: "Vote $POPCAT",
+        action: "post"
+      },
+      {
+        label: "Vote $BRETT",
+        action: "post"
+      }
+    ],
+    postUrl: `${appUrl}/api/vote`
+  };
+
   return {
     title: "$POPCAT vs $BRETT - Meme vs Meme",
     description: "Vote for the next meme to moon and earn rewards! 🚀",
@@ -45,12 +45,12 @@ export async function generateMetadata(): Promise<Metadata> {
       images: [`${appUrl}/meme.png`],
     },
     other: {
-      "fc:frame": "vNext",
+      "fc:frame": JSON.stringify(frameMetadata),
       "fc:frame:image": `${appUrl}/meme.png`,
       "fc:frame:image:aspect_ratio": "1.91:1",
+      "fc:frame:post_url": `${appUrl}/api/vote`,
       "fc:frame:button:1": "Vote $POPCAT",
       "fc:frame:button:2": "Vote $BRETT",
-      "fc:frame:post_url": `${appUrl}/api/vote`
     },
   };
 }
