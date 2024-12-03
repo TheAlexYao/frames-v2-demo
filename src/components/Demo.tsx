@@ -163,8 +163,8 @@ export default function Demo({ title = "$POPCAT vs $BRETT" }: DemoProps) {
       }
 
       const message = choice === 'BRETT' 
-        ? "I voted for $BRETT to outperform $POPCAT.\nParticipate in Meme vs Meme to earn rewards at memevsmeme.fun: https://memevsmeme.fun"
-        : "I voted for $POPCAT to outperform $BRETT.\nParticipate in Meme vs Meme to earn rewards at memevsmeme.fun: https://memevsmeme.fun";
+        ? "I voted for $BRETT to outperform $POPCAT.\nParticipate in Meme vs Meme to earn rewards. https://memevsmeme.fun"
+        : "I voted for $POPCAT to outperform $BRETT.\nParticipate in Meme vs Meme to earn rewards. https://memevsmeme.fun";
 
       const { data: vote } = await supabase
         .from('votes')
@@ -188,8 +188,8 @@ export default function Demo({ title = "$POPCAT vs $BRETT" }: DemoProps) {
 
   const resendWarpcastMessage = useCallback((choice: 'BRETT' | 'POPCAT') => {
     const message = choice === 'BRETT' 
-      ? "I voted for $BRETT to outperform $POPCAT.\n\nParticipate in Meme vs Meme to earn rewards at memevsmeme.fun: https://memevsmeme.fun"
-      : "I voted for $POPCAT to outperform $BRETT.\n\nParticipate in Meme vs Meme to earn rewards at memevsmeme.fun: https://memevsmeme.fun";
+      ? "I voted for $BRETT to outperform $POPCAT.\n\nParticipate in Meme vs Meme to earn rewards. https://memevsmeme.fun"
+      : "I voted for $POPCAT to outperform $BRETT.\n\nParticipate in Meme vs Meme to earn rewards. https://memevsmeme.fun";
     
     const encodedText = encodeURIComponent(message);
     sdk.actions.openUrl(`https://warpcast.com/~/compose?text=${encodedText}`);
