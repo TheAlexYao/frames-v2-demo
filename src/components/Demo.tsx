@@ -79,7 +79,7 @@ export default function Demo({ title = "$POPCAT vs $BRETT", description }: DemoP
   }, [isSDKLoaded]);
 
   const signBrett = useCallback(() => {
-    const message = "I voted for $BRETT to outperform $POPCAT. Participate in Meme vs Meme to earn rewards at https://memevsmeme.fun";
+    const message = "I voted for $BRETT to outperform $POPCAT.\nParticipate in Meme vs Meme to earn rewards at https://memevsmeme.fun";
     signMessage(
       { message },
       {
