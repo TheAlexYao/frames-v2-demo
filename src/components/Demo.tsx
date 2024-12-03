@@ -66,7 +66,7 @@ interface DemoProps {
   description?: string;
 }
 
-export default function Demo({ title = "$POPCAT vs $BRETT", description }: DemoProps) {
+export default function Demo({ title = "$POPCAT vs $BRETT" }: DemoProps) {
   const [isSDKLoaded, setIsSDKLoaded] = useState(false);
 
   const { address, isConnected } = useAccount();
