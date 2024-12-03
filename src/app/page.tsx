@@ -7,22 +7,14 @@ export const revalidate = 300;
 
 export async function generateMetadata(): Promise<Metadata> {
   const frameMetadata = {
-    version: "vNext",
-    frames: {
-      version: "1",
-      image: `${appUrl}/meme.png`,
-      imageAspectRatio: "1.91:1",
-      buttons: [
-        {
-          label: "Vote $POPCAT",
-          action: "post"
-        },
-        {
-          label: "Vote $BRETT",
-          action: "post"
-        }
-      ],
-      postUrl: `${appUrl}/api/vote`
+    version: "next",
+    imageUrl: `${appUrl}/meme.png`,
+    button: {
+      label: "Vote Now",
+      action: {
+        type: "link",
+        url: appUrl
+      }
     }
   };
 
@@ -41,12 +33,6 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     other: {
       "fc:frame": JSON.stringify(frameMetadata),
-      "fc:frame:image": `${appUrl}/meme.png`,
-      "fc:frame:image:aspect_ratio": "1.91:1",
-      "fc:frame:post_url": `${appUrl}/api/vote`,
-      "fc:frame:button:1": "Vote $POPCAT",
-      "fc:frame:button:2": "Vote $BRETT",
-      "fc:frame:version": "vNext"
     },
   };
 }
