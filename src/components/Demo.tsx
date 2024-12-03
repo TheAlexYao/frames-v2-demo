@@ -253,6 +253,26 @@ export default function Demo({ title = "$POPCAT vs $BRETT", description }: DemoP
 
       <div className="text-center mb-6 space-y-2">
         <h2 className="text-xl font-bold">{title}</h2>
+        
+        {isConnected && (
+          <>
+            <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4">
+              <div 
+                className="bg-purple-600 h-2.5 rounded-full transition-all"
+                style={{ 
+                  width: `${voteStats.POPCAT + voteStats.BRETT === 0 ? 50 : 
+                    (voteStats.POPCAT / (voteStats.POPCAT + voteStats.BRETT)) * 100}%` 
+                }}
+              />
+            </div>
+            
+            <div className="flex justify-between text-sm mb-2">
+              <span>POPCAT: {voteStats.POPCAT}</span>
+              <span>BRETT: {voteStats.BRETT}</span>
+            </div>
+          </>
+        )}
+
         <p className="text-sm text-gray-600 dark:text-gray-300">
           Cast your vote for the next meme to moon!
         </p>
@@ -271,42 +291,19 @@ export default function Demo({ title = "$POPCAT vs $BRETT", description }: DemoP
       </div>
 
       <div className="w-full flex flex-col items-center">
-        {address && (
-          <div className="my-2 text-xs">
-            Address: <pre className="inline">{truncateAddress(address)}</pre>
+        {!isConnected && (
+          <div className="w-full">
+            <Button
+              onClick={() => connect({ connector: config.connectors[0] })}
+              className="w-full"
+            >
+              Connect
+            </Button>
           </div>
         )}
 
-        <div className="w-full">
-          <Button
-            onClick={() =>
-              isConnected
-                ? disconnect()
-                : connect({ connector: config.connectors[0] })
-            }
-            className="w-full"
-          >
-            {isConnected ? "Disconnect" : "Connect"}
-          </Button>
-        </div>
-
         {isConnected && (
-          <div className="w-full space-y-4 mt-4">
-            <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4">
-              <div 
-                className="bg-purple-600 h-2.5 rounded-full transition-all"
-                style={{ 
-                  width: `${voteStats.POPCAT + voteStats.BRETT === 0 ? 50 : 
-                    (voteStats.POPCAT / (voteStats.POPCAT + voteStats.BRETT)) * 100}%` 
-                }}
-              />
-            </div>
-            
-            <div className="flex justify-between text-sm mb-2">
-              <span>POPCAT: {voteStats.POPCAT}</span>
-              <span>BRETT: {voteStats.BRETT}</span>
-            </div>
-
+          <div className="w-full space-y-4">
             <div>
               <Button
                 onClick={signPopcat}
@@ -329,6 +326,20 @@ export default function Demo({ title = "$POPCAT vs $BRETT", description }: DemoP
                 {userVote?.choice === 'BRETT' ? '✓ Voted $BRETT' : 'Vote $BRETT'}
               </Button>
               {isSignError && renderError(signError)}
+            </div>
+
+            <div className="mt-8 space-y-2">
+              {address && (
+                <div className="text-xs text-center">
+                  Address: <pre className="inline">{truncateAddress(address)}</pre>
+                </div>
+              )}
+              <Button
+                onClick={() => disconnect()}
+                className="w-full"
+              >
+                Disconnect
+              </Button>
             </div>
           </div>
         )}
