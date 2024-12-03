@@ -22,11 +22,12 @@ export const revalidate = 300;
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
-    title: "$POPCAT vs $BRETT",
+    title: "$POPCAT vs $BRETT - Meme vs Meme",
+    description: "Vote for the next meme to moon and earn rewards! 🚀",
     openGraph: {
-      title: "$POPCAT vs $BRETT",
-      description: "Cast your vote and participate to earn rewards!",
-      images: [`${appUrl}/meme.png`],
+      title: "$POPCAT vs $BRETT - Which Meme Will Win?",
+      description: "Vote for your favorite meme and participate to earn rewards! Join the ultimate meme showdown.",
+      // Let Next.js use the dynamic OpenGraph image
     },
     other: {
       "fc:frame": JSON.stringify(frame),
