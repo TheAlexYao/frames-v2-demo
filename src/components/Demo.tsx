@@ -111,11 +111,25 @@ export default function Demo(
   }, [signTypedData]);
 
   const signBrett = useCallback(() => {
-    signMessage({ message: "I voted for $BRETT" });
+    signMessage(
+      { message: "I voted for $BRETT" },
+      {
+        onSuccess: () => {
+          sdk.actions.openUrl("https://warpcast.com/~/compose?text=I%20voted%20for%20%24BRETT");
+        },
+      }
+    );
   }, [signMessage]);
 
   const signPopcat = useCallback(() => {
-    signMessage({ message: "I voted for $POPCAT" });
+    signMessage(
+      { message: "I voted for $POPCAT" },
+      {
+        onSuccess: () => {
+          sdk.actions.openUrl("https://warpcast.com/~/compose?text=I%20voted%20for%20%24POPCAT");
+        },
+      }
+    );
   }, [signMessage]);
 
   const toggleContext = useCallback(() => {
