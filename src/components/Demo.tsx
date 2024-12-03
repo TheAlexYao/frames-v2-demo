@@ -111,22 +111,26 @@ export default function Demo(
   }, [signTypedData]);
 
   const signBrett = useCallback(() => {
+    const message = "I voted for $BRETT to outperform $POPCAT. Participate in Meme vs Meme to earn rewards, coming soon at https://memevsmeme.fun";
     signMessage(
-      { message: "I voted for $BRETT" },
+      { message },
       {
         onSuccess: () => {
-          sdk.actions.openUrl("https://warpcast.com/~/compose?text=I%20voted%20for%20%24BRETT");
+          const encodedText = encodeURIComponent(message);
+          sdk.actions.openUrl(`https://warpcast.com/~/compose?text=${encodedText}`);
         },
       }
     );
   }, [signMessage]);
 
   const signPopcat = useCallback(() => {
+    const message = "I voted for $POPCAT to outperform $BRETT. Participate in Meme vs Meme to earn rewards, coming soon at https://memevsmeme.fun";
     signMessage(
-      { message: "I voted for $POPCAT" },
+      { message },
       {
         onSuccess: () => {
-          sdk.actions.openUrl("https://warpcast.com/~/compose?text=I%20voted%20for%20%24POPCAT");
+          const encodedText = encodeURIComponent(message);
+          sdk.actions.openUrl(`https://warpcast.com/~/compose?text=${encodedText}`);
         },
       }
     );
