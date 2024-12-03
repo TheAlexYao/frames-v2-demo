@@ -44,7 +44,7 @@ const useCountdown = (targetDate: Date) => {
   return timeLeft;
 };
 
-export default function Demo({ title }: { title?: string } = { title: "Meme vs Meme" }) {
+export default function Demo() {
   const [isSDKLoaded, setIsSDKLoaded] = useState(false);
 
   const { address, isConnected } = useAccount();
