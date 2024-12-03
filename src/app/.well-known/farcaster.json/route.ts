@@ -3,20 +3,18 @@ export async function GET() {
 
   const config = {
     accountAssociation: {
-      header:
-        "eyJmaWQiOjM2MjEsInR5cGUiOiJjdXN0b2R5Iiwia2V5IjoiMHgyY2Q4NWEwOTMyNjFmNTkyNzA4MDRBNkVBNjk3Q2VBNENlQkVjYWZFIn0",
-      payload: "eyJkb21haW4iOiJmcmFtZXMtdjIudmVyY2VsLmFwcCJ9",
-      signature:
-        "MHhiNDIwMzQ1MGZkNzgzYTExZjRiOTllZTFlYjA3NmMwOTdjM2JkOTY1NGM2ODZjYjkyZTAyMzk2Y2Q0YjU2MWY1MjY5NjI5ZGQ5NTliYjU0YzEwOGI4OGVmNjdjMTVlZTdjZDc2YTRiMGU5NzkzNzA3YzkxYzFkOWFjNTg0YmQzNjFi",
+      header: "eyJmaWQiOjU4MSwidHlwZSI6ImN1c3RvZHkiLCJrZXkiOiIweDZGMTY1QjZmZmFGM2FjZEYwOTc4YWUxNjI0NEVlRUZlNDBDMDkyYjIifQ",
+      payload: "eyJkb21haW4iOiJ3d3cubWVtZXZzbWVtZS5mdW4ifQ",
+      signature: "MHg4NzAwN2IxNjJhMjgxMDAyMmRkZDZhYzkzYTE4MTg5ZTEyOWMwODBkNDg0ZDBhZDc4NjhlODc3MjhkMmE0N2RkN2RlMmY4MGZjZDNjN2Y4ZDliYWRjMzJmZjhmODJkMjE1MGJlYTc4NDhkMzRlM2Q2ZTg4NDgzNjFjMjkwNDZjOTFi"
     },
     frame: {
       version: "0.0.0",
-      name: "Frames v2 Demo",
-      iconUrl: `${appUrl}/icon.png`,
-      splashImageUrl: `${appUrl}/splash.png`,
+      name: "Meme vs Meme",
+      iconUrl: `${appUrl}/meme.png`,
+      splashImageUrl: `${appUrl}/meme.png`,
       splashBackgroundColor: "#f7f7f7",
       homeUrl: appUrl,
-    },
+    }
   };
 
   return Response.json(config);
