@@ -269,7 +269,7 @@ export default function Demo({ title = "$POPCAT vs $BRETT", description }: DemoP
           </div>
         </div>
         <p className="text-xs text-gray-500 dark:text-gray-400">
-          Sign with your wallet and share on Warpcast to participate
+          Sign a message with your wallet and share your vote on Warpcast to participate
         </p>
       </div>
 

@@ -4,8 +4,8 @@ import "~/app/globals.css";
 import { Providers } from "~/app/providers";
 
 export const metadata: Metadata = {
-  title: "Farcaster Frames v2 Demo",
-  description: "A Farcaster Frames v2 demo app",
+  title: "Meme vs Meme",
+  description: "Meme vs Meme is a game where you can vote for your favorite meme to outperform the other. The winner gets a share of the prize pool.",
 };
 
 export default function RootLayout({
