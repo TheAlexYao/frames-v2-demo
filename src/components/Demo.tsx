@@ -94,8 +94,9 @@ export default function Demo({ title = "$POPCAT vs $BRETT" }: DemoProps) {
         console.log('Raw votes:', votes);
         
         const stats = votes?.reduce((acc, vote) => {
-          if (vote.choice === 'BRETT' || vote.choice === 'POPCAT') {
-            acc[vote.choice]++;
+          const choice = vote.choice as keyof VoteStats;
+          if (choice === 'BRETT' || choice === 'POPCAT') {
+            acc[choice]++;
           }
           return acc;
         }, { BRETT: 0, POPCAT: 0 } as VoteStats);
