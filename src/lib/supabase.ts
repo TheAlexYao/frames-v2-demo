@@ -13,7 +13,9 @@ export const supabase = createClient(supabaseUrl, supabaseKey, {
 
 export type Vote = {
   id: string;
-  choice: 'BRETT' | 'POPCAT';
+  token_a: string;
+  token_b: string;
+  choice: string;
   fid: number;
   username?: string;
   display_name?: string;

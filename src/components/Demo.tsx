@@ -91,11 +91,16 @@ export default function Demo({ title = "$POPCAT vs $BRETT" }: DemoProps) {
           return;
         }
         
+        console.log('Raw votes:', votes);
+        
         const stats = votes?.reduce((acc, vote) => {
-          acc[vote.choice as keyof VoteStats]++;
+          if (vote.choice === 'BRETT' || vote.choice === 'POPCAT') {
+            acc[vote.choice]++;
+          }
           return acc;
         }, { BRETT: 0, POPCAT: 0 } as VoteStats);
         
+        console.log('Calculated stats:', stats);
         setVoteStats(stats || { BRETT: 0, POPCAT: 0 });
       } catch (error) {
         console.error('Error fetching votes:', error);
@@ -110,8 +115,7 @@ export default function Demo({ title = "$POPCAT vs $BRETT" }: DemoProps) {
         { 
           event: '*', 
           schema: 'public', 
-          table: 'votes',
-          filter: `id=eq.${userVote?.id}`
+          table: 'votes'
         }, 
         () => {
           console.log('Vote change detected');
@@ -125,7 +129,7 @@ export default function Demo({ title = "$POPCAT vs $BRETT" }: DemoProps) {
     return () => {
       channel.unsubscribe();
     };
-  }, [userVote?.id]);
+  }, []);
 
   useEffect(() => {
     const fetchUserVote = async () => {
@@ -200,8 +204,8 @@ export default function Demo({ title = "$POPCAT vs $BRETT" }: DemoProps) {
           fid: context.user.fid,
           username: context.user.username,
           display_name: context.user.displayName,
-          pfp_url: context.user.pfpUrl,
-        } satisfies Omit<Vote, 'id' | 'created_at'>)
+          pfp_url: context.user.pfpUrl
+        })
         .select()
         .single();
       
@@ -211,6 +215,7 @@ export default function Demo({ title = "$POPCAT vs $BRETT" }: DemoProps) {
         return;
       }
           
+      console.log('Vote submitted successfully:', vote);
       setUserVote(vote);
       const encodedText = encodeURIComponent(message);
       sdk.actions.openUrl(`https://warpcast.com/~/compose?text=${encodedText}`);
