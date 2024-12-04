@@ -80,31 +80,52 @@ export default function Demo({ title = "$POPCAT vs $BRETT" }: DemoProps) {
 
   useEffect(() => {
     const fetchVotes = async () => {
-      const { data: votes } = await supabase
-        .from('votes')
-        .select('choice')
-        .throwOnError();
-      
-      const stats = votes?.reduce((acc, vote) => {
-        acc[vote.choice as keyof VoteStats]++;
-        return acc;
-      }, { BRETT: 0, POPCAT: 0 } as VoteStats);
-      
-      setVoteStats(stats || { BRETT: 0, POPCAT: 0 });
+      try {
+        const { data: votes, error } = await supabase
+          .from('votes')
+          .select('choice')
+          .throwOnError();
+        
+        if (error) {
+          console.error('Error fetching votes:', error);
+          return;
+        }
+        
+        const stats = votes?.reduce((acc, vote) => {
+          acc[vote.choice as keyof VoteStats]++;
+          return acc;
+        }, { BRETT: 0, POPCAT: 0 } as VoteStats);
+        
+        setVoteStats(stats || { BRETT: 0, POPCAT: 0 });
+      } catch (error) {
+        console.error('Error fetching votes:', error);
+      }
     };
 
     fetchVotes();
 
-    const subscription = supabase
-      .channel('votes')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'votes' }, 
-        () => fetchVotes())
-      .subscribe();
+    const channel = supabase
+      .channel('votes-channel')
+      .on('postgres_changes', 
+        { 
+          event: '*', 
+          schema: 'public', 
+          table: 'votes',
+          filter: `id=eq.${userVote?.id}`
+        }, 
+        () => {
+          console.log('Vote change detected');
+          fetchVotes();
+        }
+      )
+      .subscribe((status) => {
+        console.log('Subscription status:', status);
+      });
 
     return () => {
-      subscription.unsubscribe();
+      channel.unsubscribe();
     };
-  }, []);
+  }, [userVote?.id]);
 
   useEffect(() => {
     const fetchUserVote = async () => {
@@ -151,11 +172,17 @@ export default function Demo({ title = "$POPCAT vs $BRETT" }: DemoProps) {
         return;
       }
 
-      const { data: existingVote } = await supabase
+      const { data: existingVote, error: checkError } = await supabase
         .from('votes')
         .select()
         .eq('fid', fid)
         .single();
+      
+      if (checkError && checkError.code !== 'PGRST116') {
+        console.error('Error checking existing vote:', checkError);
+        alert('Error checking your vote. Please try again.');
+        return;
+      }
         
       if (existingVote) {
         alert('You have already voted!');
@@ -163,10 +190,10 @@ export default function Demo({ title = "$POPCAT vs $BRETT" }: DemoProps) {
       }
 
       const message = choice === 'BRETT' 
-        ? "I voted for $BRETT to outperform $POPCAT.\nParticipate in Meme vs Meme to earn rewards. https://memevsmeme.fun"
-        : "I voted for $POPCAT to outperform $BRETT.\nParticipate in Meme vs Meme to earn rewards. https://memevsmeme.fun";
+        ? "https://memevsmeme.fun\n\nI voted for $BRETT to outperform $POPCAT. Participate in Meme vs Meme to earn rewards!"
+        : "https://memevsmeme.fun\n\nI voted for $POPCAT to outperform $BRETT. Participate in Meme vs Meme to earn rewards!";
 
-      const { data: vote } = await supabase
+      const { data: vote, error: insertError } = await supabase
         .from('votes')
         .insert({
           choice,
@@ -177,10 +204,19 @@ export default function Demo({ title = "$POPCAT vs $BRETT" }: DemoProps) {
         } satisfies Omit<Vote, 'id' | 'created_at'>)
         .select()
         .single();
+      
+      if (insertError) {
+        console.error('Error inserting vote:', insertError);
+        alert('Error submitting your vote. Please try again.');
+        return;
+      }
           
       setUserVote(vote);
       const encodedText = encodeURIComponent(message);
       sdk.actions.openUrl(`https://warpcast.com/~/compose?text=${encodedText}`);
+    } catch (error) {
+      console.error('Error voting:', error);
+      alert('An error occurred while voting. Please try again.');
     } finally {
       setIsVoting(false);
     }
@@ -188,8 +224,8 @@ export default function Demo({ title = "$POPCAT vs $BRETT" }: DemoProps) {
 
   const resendWarpcastMessage = useCallback((choice: 'BRETT' | 'POPCAT') => {
     const message = choice === 'BRETT' 
-      ? "I voted for $BRETT to outperform $POPCAT.\n\nParticipate in Meme vs Meme to earn rewards. https://memevsmeme.fun"
-      : "I voted for $POPCAT to outperform $BRETT.\n\nParticipate in Meme vs Meme to earn rewards. https://memevsmeme.fun";
+      ? "https://memevsmeme.fun\n\nI voted for $BRETT to outperform $POPCAT. Participate in Meme vs Meme to earn rewards!"
+      : "https://memevsmeme.fun\n\nI voted for $POPCAT to outperform $BRETT. Participate in Meme vs Meme to earn rewards!";
     
     const encodedText = encodeURIComponent(message);
     sdk.actions.openUrl(`https://warpcast.com/~/compose?text=${encodedText}`);
