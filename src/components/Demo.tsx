@@ -173,20 +173,21 @@ export default function Demo({ title = "$POPCAT vs $BRETT" }: DemoProps) {
       const fid = context?.user?.fid;
       
       if (!fid) {
+        console.error('No FID found');
         alert('Please open this in Warpcast to vote!');
         return;
       }
 
+      // First check for existing vote
       const { data: existingVote, error: checkError } = await supabase
         .from('votes')
         .select()
         .eq('fid', fid)
         .single();
       
-      if (checkError && checkError.code !== 'PGRST116') {
+      if (checkError && checkError.code !== 'PGRST116') { // PGRST116 means no rows returned
         console.error('Error checking existing vote:', checkError);
-        alert('Error checking your vote. Please try again.');
-        return;
+        throw new Error('Error checking your vote');
       }
         
       if (existingVote) {
@@ -194,35 +195,38 @@ export default function Demo({ title = "$POPCAT vs $BRETT" }: DemoProps) {
         return;
       }
 
-      const message = choice === 'BRETT' 
-        ? "https://memevsmeme.fun\n\nI voted for $BRETT to outperform $POPCAT. Participate in Meme vs Meme to earn rewards!"
-        : "https://memevsmeme.fun\n\nI voted for $POPCAT to outperform $BRETT. Participate in Meme vs Meme to earn rewards!";
-
+      // Insert new vote
       const { data: vote, error: insertError } = await supabase
         .from('votes')
-        .insert({
+        .insert([{
           choice,
-          fid: context.user.fid,
+          fid,
           username: context.user.username,
           display_name: context.user.displayName,
           pfp_url: context.user.pfpUrl
-        })
+        }])
         .select()
         .single();
       
       if (insertError) {
         console.error('Error inserting vote:', insertError);
-        alert('Error submitting your vote. Please try again.');
-        return;
+        throw new Error('Error submitting your vote');
       }
           
       console.log('Vote submitted successfully:', vote);
       setUserVote(vote);
+
+      // Only open Warpcast if vote was successful
+      const message = choice === 'BRETT' 
+        ? "https://memevsmeme.fun\n\nI voted for $BRETT to outperform $POPCAT. Participate in Meme vs Meme to earn rewards!"
+        : "https://memevsmeme.fun\n\nI voted for $POPCAT to outperform $BRETT. Participate in Meme vs Meme to earn rewards!";
+      
       const encodedText = encodeURIComponent(message);
       sdk.actions.openUrl(`https://warpcast.com/~/compose?text=${encodedText}`);
+
     } catch (error) {
-      console.error('Error voting:', error);
-      alert('An error occurred while voting. Please try again.');
+      console.error('Error in voting process:', error);
+      alert(error instanceof Error ? error.message : 'An error occurred while voting. Please try again.');
     } finally {
       setIsVoting(false);
     }
